@@ -33,7 +33,7 @@ if (process.env.GOOGLE_CLIENT_ID) {
 // Test 2: MongoDB Connection
 console.log("\n2. MongoDB Connection:");
 try {
-  await mongoose.connect(process.env.MONGODB_URI);
+  await mongoose.connect(process.env.MONGODB_URI + "/gaming-ecommerce");
   console.log("   ✅ Connected successfully");
 
   // Test 3: Check approved emails

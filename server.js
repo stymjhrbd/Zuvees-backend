@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI + "/gaming-ecommerce")
   .then(() => console.log("MongoDB connected successfully"))
   .catch((err) => console.error("MongoDB connection error:", err));
 

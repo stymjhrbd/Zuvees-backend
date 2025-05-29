@@ -76,7 +76,7 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     // Calculate totals
-    const tax = subtotal * 0.08; // 8% tax
+    const tax = subtotal * 0.18; // 8% tax
     const shippingCost = subtotal > 100 ? 0 : 10; // Free shipping over $100
     const totalAmount = subtotal + tax + shippingCost;
 

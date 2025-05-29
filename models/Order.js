@@ -40,6 +40,16 @@ const orderSchema = new mongoose.Schema({
     type: String,
     unique: true,
     required: true,
+    default: function () {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const random = Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, "0");
+      return `ORD-${year}${month}${day}-${random}`;
+    },
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -161,27 +171,29 @@ orderSchema.index({ customer: 1, createdAt: -1 });
 orderSchema.index({ rider: 1, status: 1 });
 orderSchema.index({ status: 1, createdAt: -1 });
 
-// Generate order number
-orderSchema.pre("save", async function (next) {
-  if (!this.orderNumber) {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const random = Math.floor(Math.random() * 10000)
-      .toString()
-      .padStart(4, "0");
-    this.orderNumber = `ORD-${year}${month}${day}-${random}`;
-  }
+// Update timestamp on save
+orderSchema.pre("save", function (next) {
   this.updatedAt = Date.now();
   next();
 });
 
-// Calculate totals
+// Calculate totals before saving
 orderSchema.pre("save", function (next) {
   if (this.items && this.items.length > 0) {
-    this.subtotal = this.items.reduce((sum, item) => sum + item.subtotal, 0);
-    this.totalAmount = this.subtotal + this.tax + this.shippingCost;
+    // Ensure subtotal is calculated from items
+    this.subtotal = this.items.reduce((sum, item) => {
+      // Use subtotal if available, otherwise calculate from price * quantity
+      return sum + (item.subtotal || item.price * item.quantity);
+    }, 0);
+
+    // Ensure tax and shipping have default values
+    if (this.tax === undefined) this.tax = this.subtotal * 0.08;
+    if (this.shippingCost === undefined)
+      this.shippingCost = this.subtotal > 100 ? 0 : 10;
+
+    // Calculate total
+    this.totalAmount =
+      this.subtotal + (this.tax || 0) + (this.shippingCost || 0);
   }
   next();
 });

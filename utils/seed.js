@@ -29,14 +29,14 @@ const seedData = async () => {
         notes: "Main administrator",
       },
       { email: "jharbadesatyam@gmail.com", role: "rider", notes: "Rider 1" },
-      { email: "rider2@gaming.com", role: "rider", notes: "Rider 2" },
+      { email: "satyamjhrbd@gmail.com", role: "rider", notes: "Rider 2" },
       {
         email: "customer2@gaming.com",
         role: "customer",
         notes: "Test customer 1",
       },
       {
-        email: "satyamjhrbd@gmail.com",
+        email: "customer3@gaming.com",
         role: "customer",
         notes: "Test customer 2",
       },
