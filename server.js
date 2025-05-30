@@ -13,19 +13,39 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration
 const corsOptions = {
-  origin: [
-    process.env.CLIENT_URL,
-    process.env.ADMIN_URL,
-    process.env.RIDER_URL,
-    "http://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5175",
-  ],
+  origin: function (origin, callback) {
+    // List of allowed origins
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "https://zuvees-frontend.vercel.app",
+      "https://zuvees-admin.vercel.app",
+      "https://zuvees-rider.vercel.app",
+    ];
+
+    // Allow requests with no origin (Postman, mobile apps, etc.)
+    if (!origin) return callback(null, true);
+
+    // Check if the origin is allowed
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else if (origin.includes("vercel.app") || origin.includes("localhost")) {
+      // Allow all Vercel preview deployments and localhost
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
-  optionsSuccessStatus: 200,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Content-Length", "X-Request-Id"],
 };
+
+// Handle preflight requests explicitly
+app.options("*", cors(corsOptions));
 
 // Middleware
 app.use(cors(corsOptions));
